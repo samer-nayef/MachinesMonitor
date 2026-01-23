@@ -1,0 +1,23 @@
+machines:
+  example:
+    vpn_group:
+    host:
+    user:
+    password:
+    mongodb_query:
+      13:
+        timeline-crawl:
+          collection:
+          filter_field:
+        retweets_crawling:
+          collection:
+          filter_field:
+
+
+
+mongo_connections:
+    13:
+      uri: 'mongodb://:27017/?directConnection=true'
+      database: ''
+      username: ''
+      password: ''
