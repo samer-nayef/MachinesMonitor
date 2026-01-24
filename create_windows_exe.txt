@@ -1,0 +1,69 @@
+#!/bin/bash
+# ===================================================
+# Build Windows and Linux executables from Linux
+# ===================================================
+
+# ---------------------------
+# 1️⃣ Install Wine
+# ---------------------------
+sudo dpkg --add-architecture i386
+sudo apt update
+sudo apt install -y wine64 wine32 winbind wget unzip
+wine --version
+
+# Configure Wine to Windows 10
+winecfg &>/dev/null <<EOF
+[Set Windows version to 10 manually in the GUI]
+EOF
+
+# ---------------------------
+# 2️⃣ Download embeddable Python for Windows
+# ---------------------------
+cd ~/Downloads
+wget https://www.python.org/ftp/python/3.10.11/python-3.10.11-embed-amd64.zip
+unzip -o python-3.10.11-embed-amd64.zip -d ~/.wine/drive_c/python310
+
+# ---------------------------
+# 3️⃣ Enable site-packages in embeddable Python
+# ---------------------------
+sed -i 's/# import site/import site/' ~/.wine/drive_c/python310/python310._pth
+
+# ---------------------------
+# 4️⃣ Download get-pip.py to install pip
+# ---------------------------
+wget -O ~/Downloads/get-pip.py https://bootstrap.pypa.io/get-pip.py
+
+# ---------------------------
+# 5️⃣ Install pip in Wine Python
+# ---------------------------
+wine ~/.wine/drive_c/python310/python.exe ~/Downloads/get-pip.py
+wine ~/.wine/drive_c/python310/python.exe -m pip --version
+
+# ---------------------------
+# 6️⃣ Install PyInstaller in Wine Python
+# ---------------------------
+wine ~/.wine/drive_c/python310/python.exe -m pip install pyinstaller
+wine ~/.wine/drive_c/python310/python.exe -m PyInstaller --version
+
+# ---------------------------
+# 7️⃣ Build Windows executable
+# ---------------------------
+cd /opt/projects/PycharmProjects/machines-monitor
+wine ~/.wine/drive_c/python310/python.exe -m PyInstaller \
+    --onefile \
+    --windowed \
+    --icon=icon.ico \
+    --name monitor-dashboard-windows \
+    monitor_gui_dashboard.py
+
+echo "✅ Windows exe built at dist/monitor-dashboard-windows.exe"
+
+# ---------------------------
+# 8️⃣ Build Linux executable
+# ---------------------------
+source venv/bin/activate
+pyinstaller --onefile --windowed --icon=icon.ico \
+    --name monitor-dashboard-linux \
+    monitor_gui_dashboard.py
+
+echo "✅ Linux exe built at dist/monitor-dashboard-linux"

@@ -1,3 +1,6 @@
+# to produce executable for linux : pyinstaller --onefile --noconsole --icon=icon.ico monitor_gui_dashboard.py
+# to produce .exe :
+
 #!/usr/bin/env python3
 import customtkinter as ctk
 from tkinter import ttk, messagebox
